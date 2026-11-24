@@ -1,113 +1,131 @@
-# Отчет о лабораторной работе 2. Конфигурирование приложение Spring c помощью аннотаций. Применение AOП для логирования
+# Отчет о лабораторной работе 3. Технологии работы с базами данных.JDBC
 
 ## Цель работы
-Изучение основ работы со Spring Framework (контекст, внедрение зависимостей, жизненный цикл бинов), а также применение конфигурации через аннотации, языка выражений SpEL, аспектно-ориентированного программирования (АОП) и работы с файлами ресурсов для создания консольного приложения.
+Научить наше приложение сохранять данные в базе данных. А также научить приложение выполнять SQL запросы и выводить их результаты в логи.
 ## Выполнение работы
-было создано приложение, читающее данные о товарах из CSV-файла и выводящее их в HTML-файл.
-Создан класс ResourceFileReader для чтения и парсинга CSV-файла.
-```
-@Component
-public class ResourceFileReader {
-
-    private final Resource csvFile;
-
-    public ResourceFileReader(@Value("classpath:#{'${product.file.name}'}") Resource csvFile) {
-        this.csvFile = csvFile;
-    }
-
-    @PostConstruct
-    public void init() {
-        System.out.println("ResourceFileReader полностью инициализирован в: " + LocalDateTime.now());
-    }
-
-    public List<Product> readProducts() {
-        List<Product> products = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(csvFile.getInputStream(), StandardCharsets.UTF_8))) {
-
-            String line;
-            boolean isFirstLine = true;
-            while ((line = reader.readLine()) != null) {
-                if (isFirstLine) { isFirstLine = false; continue; }
-                if (line.trim().isEmpty()) continue;
-
-                String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-                if (parts.length >= 9) {
-                    products.add(new Product(
-                            Integer.parseInt(parts[0].trim()),
-                            parts[1].replace("\"", "").trim(),
-                            parts[2].replace("\"", "").trim(),
-                            Integer.parseInt(parts[3].trim()),
-                            Double.parseDouble(parts[4].trim()),
-                            Integer.parseInt(parts[5].trim()),
-                            parts[6].trim(), parts[7].trim(), parts[8].trim()
-                    ));
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Ошибка: " + e.getMessage());
-        }
-        return products;
-    }
-}
-```
-HTMLTableRenderer — реализация интерфейса Renderer, генерирующая HTML-страницу и сохраняющая её в файл products.html
-```
-@Primary
-@Component
-public class HTMLTableRenderer implements Renderer {
-    @Override
-    public void render(List<Product> products) throws Exception {
-        StringBuilder html = new StringBuilder();
-        html.append("<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<title>Products</title>\n</head>\n<body>\n");
-        html.append("<table border='1' style='border-collapse: collapse;'>\n");
-        html.append("<tr><th>ID</th><th>Name</th><th>Price</th><th>Stock</th></tr>\n");
-
-        for (Product p : products) {
-            html.append(String.format("<tr><td>%d</td><td>%s</td><td>%.2f</td><td>%d</td></tr>\n",
-                    p.productId(), p.name(), p.price(), p.stockQuantity()));
-        }
-
-        html.append("</table>\n</body>\n</html>");
-
-        // Сохраняем файл
-        Files.writeString(Path.of("products.html"), html.toString());
-        System.out.println("HTML таблица успешно сохранена в файл products.html");
-    }
-}
-```
-Класс аспекта (АОП). С помощью аннотаций @Aspect и @Around перехватывает вызов метода парсинга CSV и замеряет время его выполнения.
+Добавлен класс DatabaseConfig, который настраивает базу данных H2 и выполняет SQL-скрипт.
 ```
 package ru.bsuedu.cad.lab;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import javax.sql.DataSource;
 
-@Aspect
-@Component
-public class TimingAspect {
+@Configuration
+public class DatabaseConfig {
 
-    // Перехватываем метод readProducts в классе ResourceFileReader
-    @Around("execution(* ru.bsuedu.cad.lab.ResourceFileReader.readProducts(..))")
-    public Object measureParsingTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.nanoTime();
+    @Bean
+    public DataSource dataSource() {
+        return new EmbeddedDatabaseBuilder()
+                .setType(EmbeddedDatabaseType.H2)
+                .addScript("classpath:schema.sql") // Выполняет наш скрипт при старте
+                .build();
+    }
 
-        Object result = joinPoint.proceed(); // Выполняем сам метод
-
-        long end = System.nanoTime();
-        long durationMs = (end - start) / 1_000_000;
-
-        System.out.println("Парсинг CSV файла занял: " + durationMs + " мс");
-        return result;
+    @Bean
+    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 }
 ```
+Category — модель данных для категорий.
+DataBaseRenderer, сохраняет данные в БД.
+```
+@Primary
+@Component
+public class DataBaseRenderer implements Renderer {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public DataBaseRenderer(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public void render(List<Product> products, List<Category> categories) {
+
+        String insertCat = "INSERT INTO CATEGORIES (category_id, name, description) VALUES (?, ?, ?)";
+        for (Category c : categories) {
+            jdbcTemplate.update(insertCat, c.categoryId(), c.name(), c.description());
+        }
+
+
+        String insertProd = "INSERT INTO PRODUCTS (product_id, name, description, category_id, price, stock_quantity, image_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        for (Product p : products) {
+            jdbcTemplate.update(insertProd, p.productId(), p.name(), p.description(),
+                    p.categoryId(), p.price(), p.stockQuantity(), p.imageUrl(),
+                    p.createdAt(), p.updatedAt());
+        }
+        System.out.println("Данные успешно сохранены в базу данных H2!");
+    }
+}
+```
+CategoryRequest — выполняет запрос и выводит результат через Logback.
+```
+@Component
+public class CategoryRequest {
+    private static final Logger log = LoggerFactory.getLogger(CategoryRequest.class);
+    private final JdbcTemplate jdbcTemplate;
+
+    public CategoryRequest(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public void executeAndLog() {
+        log.info("--- Категории с количеством товаров > 1 ---");
+        String sql = "SELECT c.name, COUNT(p.product_id) as cnt " +
+                "FROM CATEGORIES c JOIN PRODUCTS p ON c.category_id = p.category_id " +
+                "GROUP BY c.category_id, c.name HAVING COUNT(p.product_id) > 1";
+
+        jdbcTemplate.query(sql, (rs, rowNum) ->
+                "Категория: " + rs.getString("name") + " | Товаров: " + rs.getInt("cnt")
+        ).forEach(log::info);
+
+        log.info("--------------------------------------------");
+    }
+}
+```
+SQL-код для создания базы данных:
+```SQL
+CREATE TABLE CATEGORIES (
+    category_id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(500)
+);
+
+CREATE TABLE PRODUCTS (
+    product_id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(500),
+    category_id INT,
+    price DECIMAL(10, 2),
+    stock_quantity INT,
+    image_url VARCHAR(255),
+    created_at DATE,
+    updated_at DATE,
+    FOREIGN KEY (category_id) REFERENCES CATEGORIES(category_id)
+);
+```
+Файл logback.xml:
+```
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
+```
+
 Диаграмма классов:
 ```mermaid
 classDiagram
-    %% Spring
     class Product {
         <<record>>
         +int productId
@@ -121,27 +139,67 @@ classDiagram
         +String updatedAt
     }
 
+    class Category {
+        <<record>>
+        +int categoryId
+        +String name
+        +String description
+    }
+
+    class ProductProvider {
+        <<interface>>
+        +getProducts() List~Product~
+    }
+
+    class CategoryProvider {
+        <<interface>>
+        +getCategories() List~Category~
+    }
+
+    class ProductService {
+        <<Component>>
+        -Resource csvFile
+        +getProducts() List~Product~
+        +init() void
+    }
+
+    class ConcreteCategoryProvider {
+        <<Component>>
+        -Resource csvFile
+        +getCategories() List~Category~
+    }
+
     class Renderer {
         <<interface>>
-        +render(products: List~Product~) void
+        +render(products: List~Product~, categories: List~Category~) void
+    }
+
+    class DataBaseRenderer {
+        <<Component, Primary>>
+        -JdbcTemplate jdbcTemplate
+        +render(products: List~Product~, categories: List~Category~) void
+    }
+
+    class HTMLTableRenderer {
+        <<Component>>
+        +render(products: List~Product~, categories: List~Category~) void
     }
 
     class ConsoleTableRenderer {
         <<Component>>
-        +render(products: List~Product~) void
+        +render(products: List~Product~, categories: List~Category~) void
     }
 
-    class HTMLTableRenderer {
-        <<Component, Primary>>
-        +render(products: List~Product~) void
+    class DatabaseConfig {
+        <<Configuration>>
+        +dataSource() DataSource
+        +jdbcTemplate(DataSource dataSource) JdbcTemplate
     }
 
-    class ResourceFileReader {
+    class CategoryRequest {
         <<Component>>
-        -Resource csvFile
-        +ResourceFileReader(Resource csvFile)
-        +init() void
-        +readProducts() List~Product~
+        -JdbcTemplate jdbcTemplate
+        +executeAndLog() void
     }
 
     class TimingAspect {
@@ -149,32 +207,22 @@ classDiagram
         +measureParsingTime(joinPoint: ProceedingJoinPoint) Object
     }
 
-    class App {
-        <<Configuration>>
-        +main(args: String[]) void
-    }
-
-    %% Отношения
-    ConsoleTableRenderer ..|> Renderer : implements
+    ProductService ..|> ProductProvider : implements
+    ConcreteCategoryProvider ..|> CategoryProvider : implements
+    
+    DataBaseRenderer ..|> Renderer : implements
     HTMLTableRenderer ..|> Renderer : implements
+    ConsoleTableRenderer ..|> Renderer : implements
 
-    ResourceFileReader ..> Product : creates
-    Renderer ..> Product : consumes
-
-    App ..> ResourceFileReader : gets bean
-    App ..> Renderer : gets bean
-
-    TimingAspect ..> ResourceFileReader : intercepts readProducts()
+    DataBaseRenderer ..> DatabaseConfig : uses DataSource
+    CategoryRequest ..> DatabaseConfig : uses JdbcTemplate
+    TimingAspect ..> ProductService : intercepts getProducts()
 ```
 Результат работы программы представлен на рисунке 1.
 
-<img width="606" height="110" alt="image" src="https://github.com/user-attachments/assets/ed3e7022-3a20-4f86-a664-5f2c3b30ee09" />
+<img width="1289" height="195" alt="image" src="https://github.com/user-attachments/assets/aeef0cf9-d075-4a00-84e8-a504f704377d" />
 
 Рисунок 1 - Вывод консоли
-На рисунке 2 представлена таблица в созданном файле HTML.
 
-<img width="385" height="251" alt="image" src="https://github.com/user-attachments/assets/698b0e70-42d5-45ce-b18a-b56253b6683d" />
-
-Рисунок 2 - HTML страница с таблицей.
 ## Вывод
-Научился настраивать проект Gradle для работы со Spring, применять аннотации для управления контейнером IoC и внедрения зависимостей. Освоил использование SpEL для чтения конфигурационных данных.
+Реализовано создание базы данных, подключение базы данных к приложению, выполнение SQL-запроса из приложения. Реализован метод получения информации из базы данных.
