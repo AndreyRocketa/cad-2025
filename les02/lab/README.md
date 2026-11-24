@@ -4,11 +4,13 @@
 Создание каркаса Spring-приложения с использованием Java-конфигурации, освоение инструмента сборки Gradle, реализация загрузчика CSV-файлов
 ## Выполнение работы
 Был создан проект с помощью Gradle, добавлены зависимости.
+
 <img width="583" height="226" alt="Снимок экрана 2026-11-24 204509" src="https://github.com/user-attachments/assets/bc09a4e0-0478-4863-b325-38ab204216af" />
 
 Рисунок 1 - Добавление зависимости org.springframework:spring-context:6.2.2
 
 Выполнена установка фреймворка Spring.
+
 <img width="664" height="300" alt="установка фреймворка спринг" src="https://github.com/user-attachments/assets/bd4bfb3e-d946-4e64-94fc-58756d1073eb" />
 
 Рисунок 2 - Установка фреймворка.
@@ -84,6 +86,7 @@ public class App {
 }
 ```
 На рисунке 4 представлен результат работы программы.
+
 <img width="564" height="344" alt="image" src="https://github.com/user-attachments/assets/af0501e9-3393-4228-9e92-a5ca52c7cdf0" />
 
 
