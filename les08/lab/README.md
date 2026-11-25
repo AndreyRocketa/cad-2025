@@ -395,10 +395,769 @@ classDiagram
     CategoryRepository ..> Category : manages
     OrderDetailRepository ..> OrderDetail : manages
 ```
-Результат работы программы представлен на рисунке 2.
+Результат работы программы:
+```
+Hibernate: 
+    create table CATEGORIES (
+        category_id integer not null,
+        description varchar(500),
+        name varchar(255) not null,
+        primary key (category_id)
+    )
+Hibernate: 
+    create table CUSTOMERS (
+        customer_id integer not null,
+        address varchar(255),
+        email varchar(255),
+        name varchar(255),
+        phone varchar(255),
+        primary key (customer_id)
+    )
+Hibernate: 
+    create table ORDER_DETAILS (
+        order_detail_id integer not null,
+        price numeric(38,2),
+        quantity integer not null,
+        order_id integer,
+        product_id integer,
+        primary key (order_detail_id)
+    )
+Hibernate: 
+    create table ORDERS (
+        order_id integer not null,
+        orderDate timestamp(6),
+        shippingAddress varchar(255),
+        status varchar(255),
+        totalPrice numeric(38,2),
+        customer_id integer,
+        primary key (order_id)
+    )
+Hibernate: 
+    create table PRODUCTS (
+        product_id integer not null,
+        createdAt timestamp(6),
+        description varchar(255),
+        imageUrl varchar(255),
+        name varchar(255) not null,
+        price numeric(38,2),
+        stockQuantity integer not null,
+        updatedAt timestamp(6),
+        category_id integer,
+        primary key (product_id)
+    )
+Hibernate: 
+    alter table if exists ORDER_DETAILS 
+       add constraint FK8wdku4h4c96gwubj09an8bby6 
+       foreign key (order_id) 
+       references ORDERS
+Hibernate: 
+    alter table if exists ORDER_DETAILS 
+       add constraint FKpshg2yc6vr6npa8jkbryetxrx 
+       foreign key (product_id) 
+       references PRODUCTS
+Hibernate: 
+    alter table if exists ORDERS 
+       add constraint FK1nbewmmir6psft27yfvvmwpfg 
+       foreign key (customer_id) 
+       references CUSTOMERS
+Hibernate: 
+    alter table if exists PRODUCTS 
+       add constraint FK860uwmfahxkeahlm8a800vmnb 
+       foreign key (category_id) 
+       references CATEGORIES
+03:06:54.911 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+ProductService (ранее ResourceFileReader) полностью инициализирован в: 2026-11-25T03:06:54.933875400
+03:06:55.201 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        c1_0.category_id,
+        c1_0.description,
+        c1_0.name 
+    from
+        CATEGORIES c1_0 
+    where
+        c1_0.category_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Данные из CSV успешно загружены в базу данных H2.
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CATEGORIES
+        (description, name, category_id) 
+    values
+        (?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        PRODUCTS
+        (category_id, createdAt, description, imageUrl, name, price, stockQuantity, updatedAt, product_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        CUSTOMERS
+        (address, email, name, phone, customer_id) 
+    values
+        (?, ?, ?, ?, ?)
+03:06:55.624 [main] INFO  ru.bsuedu.cad.lab.app.App - Создаем новый заказ для клиента ID=1...
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone 
+    from
+        CUSTOMERS c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        p1_0.product_id,
+        p1_0.category_id,
+        p1_0.createdAt,
+        p1_0.description,
+        p1_0.imageUrl,
+        p1_0.name,
+        p1_0.price,
+        p1_0.stockQuantity,
+        p1_0.updatedAt 
+    from
+        PRODUCTS p1_0 
+    where
+        p1_0.product_id=?
+Hibernate: 
+    select
+        o1_0.order_id,
+        o1_0.customer_id,
+        o1_0.orderDate,
+        o1_0.shippingAddress,
+        o1_0.status,
+        o1_0.totalPrice,
+        od1_0.order_id,
+        od1_0.order_detail_id,
+        od1_0.price,
+        od1_0.product_id,
+        od1_0.quantity 
+    from
+        ORDERS o1_0 
+    left join
+        ORDER_DETAILS od1_0 
+            on o1_0.order_id=od1_0.order_id 
+    where
+        o1_0.order_id=?
+Hibernate: 
+    select
+        od1_0.order_detail_id,
+        od1_0.order_id,
+        od1_0.price,
+        od1_0.product_id,
+        od1_0.quantity 
+    from
+        ORDER_DETAILS od1_0 
+    where
+        od1_0.order_detail_id=?
+Hibernate: 
+    select
+        od1_0.order_detail_id,
+        od1_0.order_id,
+        od1_0.price,
+        od1_0.product_id,
+        od1_0.quantity 
+    from
+        ORDER_DETAILS od1_0 
+    where
+        od1_0.order_detail_id=?
+Hibernate: 
+    insert 
+    into
+        ORDERS
+        (customer_id, orderDate, shippingAddress, status, totalPrice, order_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        ORDER_DETAILS
+        (order_id, price, product_id, quantity, order_detail_id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        ORDER_DETAILS
+        (order_id, price, product_id, quantity, order_detail_id) 
+    values
+        (?, ?, ?, ?, ?)
+03:06:55.655 [main] INFO  ru.bsuedu.cad.lab.app.App - Заказ успешно создан! ID заказа: 15629, Сумма: 1800.00, Адрес доставки: Москва, ул. Ленина, д. 10
+03:06:55.655 [main] INFO  ru.bsuedu.cad.lab.app.App - --- Список всех заказов в базе данных ---
+Hibernate: 
+    select
+        o1_0.order_id,
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.email,
+        c1_0.name,
+        c1_0.phone,
+        o1_0.orderDate,
+        o1_0.shippingAddress,
+        o1_0.status,
+        o1_0.totalPrice 
+    from
+        ORDERS o1_0 
+    join
+        CUSTOMERS c1_0 
+            on c1_0.customer_id=o1_0.customer_id
+03:06:55.700 [main] INFO  ru.bsuedu.cad.lab.app.App - Заказ ID: 15629, Клиент: Алексей Иванов, Сумма: 1800.00, Статус: NEW
+03:06:55.700 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+03:06:55.701 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+03:06:55.702 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+```
 
-<img width="1060" height="362" alt="Безымянный" src="https://github.com/user-attachments/assets/9cc38db3-9b73-4f76-846e-4e1c7568ea42" />
-
-Рисунок 2 - Создание заказа и вывод заказов из базы данных
 ## Вывод
 Научился работать с ORM Hibernate и Spring Data. Создал приложение для оформления заказов и сохранения в базу данных.
